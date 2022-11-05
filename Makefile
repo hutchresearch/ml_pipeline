@@ -1,8 +1,8 @@
 all:
-	python pipeline.py train
+	python src/pipeline.py train
 
 data:
-	python data.py
+	python src/data.py
 
 batch:
-	python batch.py
+	python src/batch.py

@@ -1,3 +1,8 @@
+"""
+main class for building a DL pipeline.
+
+"""
+
 import click
 from batch import Batch
 from model.linear import DNN

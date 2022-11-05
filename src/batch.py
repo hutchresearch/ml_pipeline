@@ -11,8 +11,7 @@ class Batch:
     def __init__(
         self,
         stage: Stage,
-        model: nn.Module,
-        device,
+        model: nn.Module, device,
         loader: DataLoader,
         optimizer: optim.Optimizer,
         criterion: nn.Module,
