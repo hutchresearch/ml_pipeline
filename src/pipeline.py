@@ -3,13 +3,13 @@ main class for building a DL pipeline.
 
 """
 
-import click
-from batch import Batch
+from accelerate import Accelerator
+from torch.utils.data import DataLoader
+from torch.optim import AdamW
+from data import GenericDataset
 from model.linear import DNN
-from model.cnn import VGG16, VGG11
-from data import FashionDataset
-from utils import Stage
-import torch
+from runner import Runner
+import click
 
 
 @click.group()
@@ -19,29 +19,42 @@ def cli():
 
 @cli.command()
 def train():
-    batch_size = 16
-    num_workers = 8
 
-    path = "fashion-mnist_train.csv"
-    trainset = FashionDataset(path=path)
+    # Initialize hyperparameters
+    hidden_size = 128
+    epochs = 1000
+    batch_size = 10
+    lr = 0.001
 
-    trainloader = torch.utils.data.DataLoader(
-        trainset, batch_size=batch_size, shuffle=False, num_workers=num_workers
-    )
-    model = VGG11(in_channels=1, num_classes=10)
-    criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=2e-4)
-    batch = Batch(
-        stage=Stage.TRAIN,
+    # Accelerator is in charge of auto casting tensors to the appropriate GPU device
+    accelerator = Accelerator()
+
+    # Initialize the training set and a dataloader to iterate over the dataset
+    train_set = GenericDataset()
+    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
+
+    # Get the size of the input and output vectors from the training set
+    in_features, out_features = train_set.get_in_out_size()
+
+    # Create the model and optimizer and cast model to the appropriate GPU
+    model = DNN(in_features, hidden_size, out_features).to(accelerator.device)
+    optimizer = AdamW(model.parameters(), lr=lr)
+
+    # Create a runner that will handle
+    runner = Runner(
+        train_set=train_set,
+        train_loader=train_loader,
+        accelerator=accelerator,
         model=model,
-        device=torch.device("cpu"),
-        loader=trainloader,
-        criterion=criterion,
         optimizer=optimizer,
     )
-    batch.run(
-        "Run run run run. Run run run away. Oh Oh oH OHHHHHHH yayayayayayayayaya! - David Byrne"
-    )
+
+    # Train the model
+    for _ in range(epochs):
+
+        # Run one loop of training and record the average loss
+        train_stats = runner.next()
+        print(f"{train_stats}")
 
 
 if __name__ == "__main__":

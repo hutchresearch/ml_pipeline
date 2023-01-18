@@ -3,6 +3,28 @@ import numpy as np
 import einops
 import csv
 import torch
+import click
+
+
+SAMPLES = 500
+IN_DIM = 30
+OUT_DIM = 20
+
+
+class GenericDataset(Dataset):
+    def __init__(self):
+        rng = np.random.default_rng()
+        self.x = rng.normal(size=(SAMPLES, IN_DIM)).astype(np.float32)
+        self.y = 500 * rng.normal(size=(SAMPLES, OUT_DIM)).astype(np.float32)
+
+    def __getitem__(self, idx):
+        return (self.x[idx], self.y[idx])
+
+    def __len__(self):
+        return len(self.x)
+
+    def get_in_out_size(self):
+        return self.x.shape[1], self.y.shape[1]
 
 
 class FashionDataset(Dataset):
@@ -41,6 +63,12 @@ class FashionDataset(Dataset):
             return (images, classes)
 
 
+@click.group()
+def cli():
+    ...
+
+
+@cli.command()
 def main():
     path = "fashion-mnist_train.csv"
     dataset = FashionDataset(path=path)
@@ -50,5 +78,10 @@ def main():
     print(f"mean shape: {mean.shape}")
 
 
+@cli.command()
+def generic():
+    dataset = GenericDataset()
+
+
 if __name__ == "__main__":
-    main()
+    cli()
