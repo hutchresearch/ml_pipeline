@@ -1,15 +1,25 @@
 CONDA_ENV=ml_pipeline
+.PHONY: help
 
-all: run
+all: help
 
-run:
-	./launch.sh
+run: ## run the pipeline (train)
+	python src/pipeline.py \
+		debug=false
+debug: ## run the pipeline (train) with debugging enabled
+	python src/pipeline.py \
+		debug=true
 
-data:
-	python src/data.py
+data: ## download the mnist data
+	wget https://pjreddie.com/media/files/mnist_train.csv -O data/mnist_train.csv
+	wget https://pjreddie.com/media/files/mnist_test.csv -O data/mnist_test.csv
 
-batch:
-	python src/batch.py
+env_import: environment.yml ## import any changes to env.yml into conda env
+	conda env update -n ${CONDA_ENV} --file $^
 
-install:
-	conda env updates -n ${CONDA_ENV} --file environment.yml
+env_export: ## export the conda envirnoment without package or name
+	conda env export | head -n -1 | tail -n +2 > $@
+
+help: ## display this help message
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+

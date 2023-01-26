@@ -1,3 +1,6 @@
+"""
+runner for training and valdating
+"""
 import torch
 from torch import nn
 from torch import optim
@@ -8,7 +11,7 @@ from utils import Stage
 from omegaconf import DictConfig
 
 
-class Batch:
+class Runner:
     def __init__(
         self,
         stage: Stage,
@@ -34,8 +37,7 @@ class Batch:
             self.model.train()
         if self.config.debug:
             breakpoint()
-        epoch = 0
-        for epoch, (x, y) in enumerate(tqdm(self.loader, desc=desc)):
+        for batch, (x, y) in enumerate(tqdm(self.loader, desc=desc)):
             self.optimizer.zero_grad()
             loss = self._run_batch((x, y))
             loss.backward()  # Send loss backwards to accumulate gradients
