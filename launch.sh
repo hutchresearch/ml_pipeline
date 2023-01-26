@@ -1,2 +1,2 @@
-python src/pipeline.py \
+python src/train.py \
     debug=false

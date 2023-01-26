@@ -5,9 +5,8 @@ import torch
 from torch import nn
 from torch import optim
 from torch.utils.data import DataLoader
-from data import MnistDataset
 from tqdm import tqdm
-from utils import Stage
+from pipeline.utils import Stage
 from omegaconf import DictConfig
 
 
@@ -51,29 +50,3 @@ class Runner:
         pred_y = self.model(true_x)
         loss = self.criterion(pred_y, true_y)
         return loss
-
-
-def main():
-    model = nn.Conv2d(1, 64, 3)
-    criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=2e-4)
-    path = "mnist_train.csv"
-    dataset = MnistDataset(path)
-    batch_size = 16
-    num_workers = 1
-    loader = torch.utils.data.DataLoader(
-        dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers
-    )
-    batch = Batch(
-        Stage.TRAIN,
-        device=torch.device("cpu"),
-        model=model,
-        criterion=criterion,
-        optimizer=optimizer,
-        loader=loader,
-    )
-    batch.run("test")
-
-
-if __name__ == "__main__":
-    main()

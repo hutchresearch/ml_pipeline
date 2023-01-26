@@ -13,14 +13,14 @@ coordinates:
 - runner
 
 """
-from runner import Runner
+from pipeline.runner import Runner
 from model.linear import DNN
 from model.cnn import VGG16, VGG11
-from data import MnistDataset
-from utils import Stage
+from data.dataset import MnistDataset
+from pipeline.utils import Stage
 import torch
 from pathlib import Path
-from collate import channel_to_batch
+from data.collate import channel_to_batch
 import hydra
 from omegaconf import DictConfig
 

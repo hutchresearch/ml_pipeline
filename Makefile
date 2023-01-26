@@ -4,17 +4,17 @@ CONDA_ENV=ml_pipeline
 all: help
 
 run: ## run the pipeline (train)
-	python src/pipeline.py \
+	python src/train.py \
 		debug=false
 debug: ## run the pipeline (train) with debugging enabled
-	python src/pipeline.py \
+	python src/train.py \
 		debug=true
 
 data: ## download the mnist data
 	wget https://pjreddie.com/media/files/mnist_train.csv -O data/mnist_train.csv
 	wget https://pjreddie.com/media/files/mnist_test.csv -O data/mnist_test.csv
 
-env_import: environment.yml ## import any changes to env.yml into conda env
+install: environment.yml ## import any changes to env.yml into conda env
 	conda env update -n ${CONDA_ENV} --file $^
 
 env_export: ## export the conda envirnoment without package or name
