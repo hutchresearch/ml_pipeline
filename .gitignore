@@ -1,2 +1,4 @@
 storage/
 __pycache__/
+outputs/
+.env

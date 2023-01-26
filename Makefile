@@ -3,7 +3,7 @@ CONDA_ENV=ml_pipeline
 all: run
 
 run:
-	python src/pipeline.py train
+	./launch.sh
 
 data:
 	python src/data.py
