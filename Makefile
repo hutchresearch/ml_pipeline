@@ -14,8 +14,11 @@ data: ## download the mnist data
 	wget https://pjreddie.com/media/files/mnist_train.csv -O data/mnist_train.csv
 	wget https://pjreddie.com/media/files/mnist_test.csv -O data/mnist_test.csv
 
-install: environment.yml ## import any changes to env.yml into conda env
-	conda env update -n ${CONDA_ENV} --file $^
+install: conda-lock.yml ## import any changes to env.yml into conda env
+	conda-lock install --name ${CONDA_ENV} $^
+
+lock: environment.yml ## lock the current conda env
+	conda-lock
 
 env_export: ## export the conda envirnoment without package or name
 	conda env export | head -n -1 | tail -n +2 > $@
