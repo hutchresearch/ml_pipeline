@@ -1,6 +1,8 @@
 PYTHON_VERSION=3.10
 ENV_NAME=ml_pipeline
-INSTALL_DIR=$HOME/Dev
+ENV_NAME=ml_climate_gcam22
+INSTALL_DIR=$HOME/.local/lib
+CONDA_DIR=$INSTALL_DIR/miniconda3
 # for wwu research:
 # INSTALL_DIR=/research/hutchinson/workspace/$USERNAME
 
@@ -9,7 +11,7 @@ INSTALL_DIR=$HOME/Dev
 # download miniconda
 #
 ####################
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/Downloads/Miniconda3-latest-Linux-x86_64.sh
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
 
 ####################
 #
@@ -17,8 +19,8 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $H
 # headless
 #
 ####################
-rm -rf $INSTALL_DIR/miniconda3
-bash $HOME/Downloads/Miniconda3-latest-Linux-x86_64.sh -b -p $INSTALL_DIR/miniconda3
+rm -rf $CONDA_DIR
+bash /tmp/miniconda.sh -b -p $CONDA_DIR
 
 ####################
 #
