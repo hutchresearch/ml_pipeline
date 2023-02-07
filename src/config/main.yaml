@@ -1,5 +1,5 @@
 app_dir: ${hydra:runtime.cwd}
-debug: true
+debug: False
 lr: 2e-4
 batch_size: 16
 num_workers: 0

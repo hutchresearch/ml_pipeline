@@ -33,7 +33,7 @@ class WandbLogger:
 
     def metrics(self, metrics: dict):
         """loss etc."""
-        
+
         self.data_dict.update(metrics)
 
     def hyperparameters(self, hyperparameters: dict):
@@ -45,12 +45,12 @@ class WandbLogger:
 
     def image(self, image: dict):
         """log images to wandb"""
-        self.data_dict.update({'Generate Image' : image})
+        self.data_dict.update({"Generate Image": image})
 
     def video(self, images: str, title: str):
         """log images to wandb"""
-        
-        images = np.uint8(rearrange(images, 't b c h w -> b t c h w'))
+
+        images = np.uint8(rearrange(images, "t b c h w -> b t c h w"))
         self.data_dict.update({f"{title}": wandb.Video(images, fps=20)})
 
     def flush(self):
@@ -107,5 +107,3 @@ class Checkpoint:
 
         name = "".join(random.choices(string.ascii_letters, k=10)) + ".tar"
         torch.save(checkpoint, f"{name}")
-
-

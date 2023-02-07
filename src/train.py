@@ -13,26 +13,32 @@ coordinates:
 - runner
 
 """
-from pipeline.runner import Runner
 from model.linear import DNN
 from model.cnn import VGG16, VGG11
 from data.dataset import MnistDataset
 from pipeline.utils import Stage
+from pipeline.runner import Runner
 import torch
 from pathlib import Path
 from data.collate import channel_to_batch
 import hydra
 from omegaconf import DictConfig
+from accelerate import Accelerator
+from torch import nn
+from torch import optim
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+from pipeline.utils import Stage
 
 
-@hydra.main(config_path="config", config_name="main")
+@hydra.main(config_path="config", config_name="main", version_base=None)
 def train(config: DictConfig):
+    accelerator = Accelerator()
     if config.debug:
         breakpoint()
     lr = config.lr
     batch_size = config.batch_size
     num_workers = config.num_workers
-    device = config.device
     epochs = config.epochs
 
     train_path = Path(config.app_dir) / "data/mnist_train.csv"
@@ -56,24 +62,16 @@ def train(config: DictConfig):
         # collate_fn=channel_to_batch,
     )
     model = VGG11(in_channels=1, num_classes=10)
-    criterion = torch.nn.CrossEntropyLoss()
+    loss_function = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    model, optimizer, trainloader = accelerator.prepare(model, optimizer, trainloader)
     train_runner = Runner(
         stage=Stage.TRAIN,
         model=model,
-        device=torch.device(device),
         loader=trainloader,
-        criterion=criterion,
+        loss_function=loss_function,
         optimizer=optimizer,
-        config=config,
-    )
-    dev_runner = Runner(
-        stage=Stage.DEV,
-        model=model,
-        device=torch.device(device),
-        loader=devloader,
-        criterion=criterion,
-        optimizer=optimizer,
+        accelerator=accelerator,
         config=config,
     )
 

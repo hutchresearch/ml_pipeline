@@ -1,11 +1,18 @@
 CONDA_ENV=ml_pipeline
-.PHONY: help
+.PHONY: help data test run
 
 all: help
 
 run: ## run the pipeline (train)
-	python src/train.py \
-		debug=false
+	accelerate launch \
+		--num_processes 2 \
+		--num_machines 1 \
+		--mixed_precision fp16 \
+		--dynamo_backend no \
+		--multi_gpu \
+		src/train.py \
+		debug=False
+
 debug: ## run the pipeline (train) with debugging enabled
 	python src/train.py \
 		debug=true
@@ -18,7 +25,10 @@ install: environment.yml ## import any changes to env.yml into conda env
 	conda env update -n ${CONDA_ENV} --file $^
 
 env_export: ## export the conda envirnoment without package or name
-	conda env export | head -n -1 | tail -n +2 > $@
+	conda env export | head -n -1 | tail -n +2 > environment.yml
+
+test: ## run the pytest unit tests
+	pytest test/*.py
 
 help: ## display this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
